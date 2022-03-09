@@ -3,24 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-/**
-balanceOf(owner)
-ownerOf(tokenId)
-
-safeTransferFrom(from, to, tokenId)
-safeTransferFrom(from, to, tokenId, data)
-transferFrom(from, to, tokenId)
-
-approve(to, tokenId)
-getApproved(tokenId)
-setApprovalForAll(operator, approved)
-isApprovedForAll(owner, operator)
- */
-
-contract ERC721 is Context{
-    string public _name;
-    string public _symbol;
+contract ERC721 is Context, IERC721Metadata, ERC165 {
+    string private _name;
+    string private _symbol;
 
     mapping(uint256 => address) public _owners;
     mapping(address => uint256) public _balances;
@@ -29,42 +17,40 @@ contract ERC721 is Context{
     mapping(uint256 => string) public _metadatas;
     uint256 counter;
 
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
-    event Approval(
-        address indexed from,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
-    event ApprovalForAll(
-        address indexed from,
-        address indexed operator,
-        bool approved
-    );
-
     constructor(string memory name, string memory symbol) {
         _name = name;
         _symbol = symbol;
     }
 
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
+    function name() public view override returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view override returns (string memory) {
+        return _symbol;
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
         return _metadatas[tokenId];
     }
 
-    function balanceOf(address owner) public view returns (uint256) {
+    function balanceOf(address owner) public view override returns (uint256) {
         return _balances[owner];
     }
 
-    function ownerOf(uint256 tokenId) public view returns (address) {
+    function ownerOf(uint256 tokenId) public view override returns (address) {
         return _owners[tokenId];
     }
 
     function isApprovedForAll(address owner, address operator)
         public
         view
+        override
         returns (bool)
     {
         return _operatorApprovals[owner][operator];
@@ -81,7 +67,7 @@ contract ERC721 is Context{
         counter++;
     }
 
-    function approve(address to, uint256 tokenId) public {
+    function approve(address to, uint256 tokenId) public override {
         address owner = ownerOf(tokenId);
         require(to != owner, "Approval to owner");
         require(
@@ -94,7 +80,12 @@ contract ERC721 is Context{
         emit Approval(owner, to, tokenId);
     }
 
-    function getApproved(uint256 tokenId) public view returns (address) {
+    function getApproved(uint256 tokenId)
+        public
+        view
+        override
+        returns (address)
+    {
         require(_exists(tokenId), "Token with this id doesn't exist");
         return _tokenApprovals[tokenId];
     }
@@ -119,7 +110,7 @@ contract ERC721 is Context{
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) public override {
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -128,7 +119,7 @@ contract ERC721 is Context{
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public {
+    ) public override {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "Not approved or owner"
@@ -137,7 +128,6 @@ contract ERC721 is Context{
         // TODO: to do safety
         // require(...);
     }
-
 
     function _transfer(
         address from,
@@ -159,7 +149,7 @@ contract ERC721 is Context{
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) public override {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "Not approved or owner"
@@ -179,9 +169,19 @@ contract ERC721 is Context{
             spender == getApproved(tokenId));
     }
 
-    function setApprovalForAll(address operator, bool approved) public {
+    function setApprovalForAll(address operator, bool approved)
+        public
+        override
+    {
         require(_msgSender() != operator, "Caller is operator");
         _operatorApprovals[_msgSender()][operator] = approved;
         emit ApprovalForAll(_msgSender(), operator, approved);
+    }
+
+    function supportsInterfaces(bytes4 interfaceId) public view returns (bool) {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }
