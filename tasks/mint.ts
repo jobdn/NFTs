@@ -9,8 +9,6 @@ task("mint", "Mint your ERC721 token for owner and metadata")
 
     const erc721 = await hre.ethers.getContractAt("MainERC721", config.ERC721);
 
-    const tokenId = await (await erc721.mint(owner, metadata)).wait();
-    console.log(`${tokenId}`);
-    const ownerBalance = await erc721.balanceOf(owner);
-    console.log(`${owner} minted token with ${tokenId} id`);
+    await erc721.mint(owner, metadata);
+    console.log(`${owner} minted token`);
   });
