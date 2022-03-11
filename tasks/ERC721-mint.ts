@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 import { config } from "../config";
 
-task("mint", "Mint your ERC721 token for owner and metadata")
+task("mintERC721", "Mint your ERC721 token for owner and metadata")
   .addParam("owner", "Owner who owned of token")
   .addParam("metadata", "Metadata for token")
   .setAction(async (taskArgs, hre) => {

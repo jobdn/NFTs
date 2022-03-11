@@ -3,7 +3,7 @@ export const config = {
   ERC721_NAME: "MAIN-ERC721",
   ERC721_SYMBOL: "MERC721",
   //=============
-  ERC1155: "0x138972D3204Ac5b38dc4c3469AA8a16243FdcCBA",
+  ERC1155: "0x5B86f7AEcc4132C12875F1317fa47EE7e40296D7",
   ERC1155_URI:
     "https://ipfs.io/ipfs/Qmf4vjaiP44f36mhiK63eDEFECYqyX4voUPyk16QqcFxn6",
 };

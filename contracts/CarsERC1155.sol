@@ -25,6 +25,10 @@ contract CarsERC1155 is ERC1155 {
     ) public {
         bytes memory dataInBytes = bytes(data);
         _mintBatch(msg.sender, ids, amounts, dataInBytes);
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            _uris[ids[i]] = data;
+        }
     }
 
     function burn(
@@ -37,7 +41,11 @@ contract CarsERC1155 is ERC1155 {
         setURI(id, "");
     }
 
-    function burnBatch(address from, uint256[] memory ids, uint256[] memory amounts) public {
+    function burnBatch(
+        address from,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) public {
         require(msg.sender == from, "You cannot burn tokens batch of 'from'");
         _burnBatch(from, ids, amounts);
     }
