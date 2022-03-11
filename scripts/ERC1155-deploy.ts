@@ -3,7 +3,7 @@ import { config } from "../config";
 
 async function main() {
   const CarsERC1155 = await ethers.getContractFactory("CarsERC1155");
-  const carsERC1155 = await CarsERC1155.deploy();
+  const carsERC1155 = await CarsERC1155.deploy(config.ERC1155_URI);
 
   await carsERC1155.deployed();
 

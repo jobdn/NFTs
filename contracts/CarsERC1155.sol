@@ -4,11 +4,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 contract CarsERC1155 is ERC1155 {
-    string constant mainURI =
-        "https://ipfs.io/ipfs/Qmf4vjaiP44f36mhiK63eDEFECYqyX4voUPyk16QqcFxn6";
     mapping(uint256 => string) private _uris;
 
-    constructor() ERC1155(mainURI) {}
+    constructor(string memory mainURI) ERC1155(mainURI) {}
 
     function mint(
         uint256 id,
@@ -29,12 +27,19 @@ contract CarsERC1155 is ERC1155 {
         _mintBatch(msg.sender, ids, amounts, dataInBytes);
     }
 
-    function burn(uint256 id, uint256 amount) public {
-        _burn(msg.sender, id, amount);
+    function burn(
+        address from,
+        uint256 id,
+        uint256 amount
+    ) public {
+        require(msg.sender == from, "You cannot burn tokens of 'from'");
+        _burn(from, id, amount);
+        setURI(id, "");
     }
 
-    function burnButch(uint256[] memory ids, uint256[] memory amounts) public {
-        _burnBatch(msg.sender, ids, amounts);
+    function burnBatch(address from, uint256[] memory ids, uint256[] memory amounts) public {
+        require(msg.sender == from, "You cannot burn tokens batch of 'from'");
+        _burnBatch(from, ids, amounts);
     }
 
     function uri(uint256 id) public view override returns (string memory) {
