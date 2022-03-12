@@ -32,14 +32,14 @@ describe("ERC721", () => {
       );
     });
 
-    it("should fail if mint token with already using metadata", async () => {
+    it("Should fail if not owner try to mint", async () => {
       const METADATA = "Qme4DRXBNLmMTuT2A4AhKG5PPWNAEr5FyowFjDjQN4XCQX";
-      await erc721Contract.mint(owner.address, METADATA);
       await expect(
-        erc721Contract.mint(owner.address, METADATA)
-      ).to.be.revertedWith("Token with this metadata already exists");
+        erc721Contract.connect(acc1).mint(owner.address, METADATA)
+      ).to.be.revertedWith("You cannot mint tokens");
     });
   });
+
   describe("Burn", () => {
     it("Should burn token", async () => {
       const METADATA = "Qme4DRXBNLmMTuT2A4AhKG5PPWNAEr5FyowFjDjQN4XCQX";
@@ -57,7 +57,7 @@ describe("ERC721", () => {
       await erc721Contract.mint(owner.address, METADATA);
 
       await expect(erc721Contract.connect(acc1).burn(1)).to.be.revertedWith(
-        "You cannot burn this token"
+        "You cannot burn tokens"
       );
     });
   });
@@ -106,6 +106,17 @@ describe("ERC721", () => {
       expect(await erc721Contract.balanceOf(acc2.address)).to.equal(1);
       expect(await erc721Contract.balanceOf(owner.address)).to.equal(0);
       expect(await erc721Contract.ownerOf(2)).to.equal(acc2.address);
+    });
+  });
+
+  describe("Check supports interfaces", () => {
+    it("Should return true for IERC165 and IERC721", async () => {
+      expect(await erc721Contract.supportsInterface("0x01ffc9a7")).to.equal(
+        true
+      );
+      expect(await erc721Contract.supportsInterface("0xffffffff")).to.equal(
+        false
+      );
     });
   });
 });
