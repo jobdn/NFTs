@@ -49,6 +49,7 @@ describe("ERC721", () => {
       await expect(erc721Contract.tokenURI(1)).to.be.revertedWith(
         "Token with this id doesn't exist"
       );
+
       expect(await erc721Contract.balanceOf(owner.address)).to.equal(0);
     });
 
@@ -61,6 +62,21 @@ describe("ERC721", () => {
       );
     });
   });
+
+  describe("Set token URI", () => {
+    it("Should fail if sender try to set URI to nonexistent token", async () => {
+      await expect(erc721Contract.setTokenURI(2, "new_uri")).to.be.revertedWith(
+        "Token with this id doesn't exist"
+      );
+    });
+
+    it("Should fail if sender doesn't have ADMIN_ROLE in setTokenURI", async () => {
+      await expect(
+        erc721Contract.connect(acc1).setTokenURI(1, "new_uri")
+      ).to.be.revertedWith("Only admin can set token URI");
+    });
+  });
+
   describe("Transfer", () => {
     it("Should transfer token", async () => {
       const METADATA = "Qme4DRXBNLmMTuT2A4AhKG5PPWNAEr5FyowFjDjQN4XCQX";
